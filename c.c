@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#define  value
  
 char *decimal_to_binary(int);
  
@@ -12,6 +14,8 @@ int main(int argc, char const *argv[])
  
    printf("Enter an integer in decimal number system\n");
    scanf("%d",&n);
+
+   ADDRESS = make_address(KEY, DIR_PROF)
  
    pointer = decimal_to_binary(n);
    printf("Binary string of %d is: %s\n", n, pointer);
@@ -46,6 +50,21 @@ char *decimal_to_binary(int n)
    *(pointer+count) = '\0';
  
    return  pointer;
+}
+
+make_address(KEY, PROFUNDIDADE){
+	/*inverte os bits do endereço e extrai PROFUNDIDADE bits*/
+	faça RETVAL = 0 /*armazenará a sequencia de invertida de bits*/
+	faça MASK = 1   /*máscara 0...001 para extrair o bit de mais baixa ordem*/
+	HASHVAL = hash(KEY)
+	Para j = 1 até PROFUNDIDADE
+		RETVAL = RETVAL	leftshifted	uma posição 	/*RETVAL << 1*/
+		/* extrair o bit de mais baixa ordem de HASHVAL*/
+		LOWBIT = HASHVAL bitwise AND MASK	/*HASHVAL & MASK*/
+		/* insere LOWBIT no final de RETVAL*/
+		RETVAL = RETVAL bitwise OR LOWBIT 	/*RETVAL | LOWBIT*/
+		HASHVAL = HASHVAL rightshifted uma posição 	/*HASHVAL >> 1*/
+	return RETVAL;
 }
 
 /* Usaremos a própria chave como endereço hash
