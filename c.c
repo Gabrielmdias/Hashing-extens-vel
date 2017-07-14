@@ -1,97 +1,105 @@
-
-
 #include <stdio.h>
 #include <stdlib.h>
 
-#define  value
+#define TAM_MAX_BUCKET 3
  
-char *decimal_to_binary(int);
- 
-int main(int argc, char const *argv[])
-{
-   int n, c, k;
-   char *pointer;
- 
-   printf("Enter an integer in decimal number system\n");
-   scanf("%d",&n);
+char *hash(int KEY);
+int make_address(int KEY, int PROFUNDIDADE);
+int op_add(int KEY);
+int op_find(int KEY, int FOUND_BUCKET);
 
-   ADDRESS = make_address(KEY, DIR_PROF)
- 
-   pointer = decimal_to_binary(n);
-   printf("Binary string of %d is: %s\n", n, pointer);
- 
-   free(pointer);
- 
-   return 0;
-}
- 
-char *decimal_to_binary(int n)
+typedef struct BUCKET
 {
-   int c, d, count;
-   char *pointer;
- 
-   count = 0;
-   pointer = (char*)malloc(32+1);
- 
-   if ( pointer == NULL )
-      exit(EXIT_FAILURE);
- 
-   for ( c = 31 ; c >= 0 ; c-- )
-   {
-      d = n >> c;
- 
-      if ( d & 1 )
-         *(pointer+count) = 1 + '0';
-      else
-         *(pointer+count) = 0 + '0';
- 
-      count++;
-   }
-   *(pointer+count) = '\0';
- 
-   return  pointer;
-}
+	int PROFUNDIDADE; // bits usados para endereçar as chaves deste bucket
+	int CONTADOR; // número de chaves contidas no bucket
+	int	CHAVES[TAM_MAX_BUCKET]; //armazena as chaves
+} BUCKET;
 
-make_address(KEY, PROFUNDIDADE){
-	/*inverte os bits do endereço e extrai PROFUNDIDADE bits*/
-	faça RETVAL = 0 /*armazenará a sequencia de invertida de bits*/
-	faça MASK = 1   /*máscara 0...001 para extrair o bit de mais baixa ordem*/
-	HASHVAL = hash(KEY)
-	Para j = 1 até PROFUNDIDADE
-		RETVAL = RETVAL	leftshifted	uma posição 	/*RETVAL << 1*/
-		/* extrair o bit de mais baixa ordem de HASHVAL*/
-		LOWBIT = HASHVAL bitwise AND MASK	/*HASHVAL & MASK*/
-		/* insere LOWBIT no final de RETVAL*/
-		RETVAL = RETVAL bitwise OR LOWBIT 	/*RETVAL | LOWBIT*/
-		HASHVAL = HASHVAL rightshifted uma posição 	/*HASHVAL >> 1*/
-	return RETVAL;
-}
+typedef struct DIR_CELL
+{
+	int BUCKET_REF; // armazena o RRN ou outra referência para um BUCKET em disco
+} DIR_CELL;
 
 /* Usaremos a própria chave como endereço hash
 não há necessidade de transformar as chaves antes de 
 fazer a extração dos bits usados para o endereçamento 
 No. máx de 6 dígitos é 999999 em decimal que equivale a 
 1111 0100 0010 0011 1111 que usa 20 bits */
+ 
+int main(int argc, char const *argv[])
+{
+   int KEY;
+   char *pointer;
+ 
+   printf("Enter an integer in decimal number system:\n");
+   scanf("%d", &KEY);
+
+   pointer = hash(KEY);
+   printf("Binary string of %d is: %s\n", KEY, pointer);
+
+   op_add(KEY);
+ 
+   free(pointer);
+ 
+   return 0;
+}
+ 
+char *hash(int KEY)
+{
+	int c, d, count = 0;
+	char pointer[32+1];
+ 
+   	if (pointer == NULL)
+    	exit(EXIT_FAILURE);
+ 
+	for (c = 32; c >= 0; c--) {
+ 		d = KEY >> c; 
+      	if (d & 1)
+      		*(pointer+count) = 1 + '0';
+      	else
+      		*(pointer+count) = 0 + '0'; 
+      	count++;
+   	}
+   	*(pointer+count) = '\0';
+   	printf("%s\n", pointer);
+   	return pointer;
+}
+
+int make_address(int KEY, int PROFUNDIDADE)
+{
+	int RETVAL = 0, LOWBIT,	MASK = 1;
+	char *HASHVAL = hash(KEY);
+	for (int i = 1; i < PROFUNDIDADE; i++)
+	{
+		//RETVAL = RETVAL << 1;
+		//LOWBIT = HASHVAL bitwise & MASK
+		//RETVAL = RETVAL bitwise | LOWBIT;
+	}
+	return RETVAL;
+}
+
+int op_add(int KEY)
+{
+	int FOUND_BUCKET = 0;
+	if (op_find(KEY, FOUND_BUCKET))
+		printf("success\n");
+	else
+		//bk_add_key(FOUND_BUCKET, KEY);
+		printf("failure\n");
+}
+
+int op_find(int KEY, int FOUND_BUCKET){
+	//int DIR_PROF = 0;
+	//int ADDRESS = make_address(KEY, DIR_PROF);
+	//FOUND_BUCKET = DIRETORIO[ADDRESS].BUCKET_REF
+	//Ler FOUND_BUCKET para a memória e buscar por KEY
+	//if (chave está em FOUND_BUCKET)
+		//retornar success
+	//else
+		//retornar failure
+}
 
 /*
-op_add(KEY){	//FUNÇÃO DE INSERÇÃO
-	if (op_find(KEY, FOUND_BUCKET))
-		//retornar success
-	else
-		bk_add_key(FOUND_BUCKET, KEY)
-		//retornar failure
-}
-
-op_find(KEY, FOUND_BUCKET){	//FUNÇÃO DE BUSCA
-	ADDRESS = make_address(KEY, DIR_PROF)
-	FOUND_BUCKET = bucket referenciado por DIRETORIO[ADDRESS].BUCKET_REF
-	Ler FOUND_BUCKET para a memória e buscar por KEY
-	if (chave está em FOUND_BUCKET)
-		//retornar success
-	else
-		//retornar failure
-}
-
 bk_add_key(BUCKET, KEY){
 	if (BUCKET.CONTADOR < TAM_MAX_BUCKET)
 		inserir a chave KEY em BUCKET
