@@ -20,6 +20,12 @@ typedef struct DIR_CELL
 	int BUCKET_REF; // armazena o RRN ou outra referência para um BUCKET em disco
 } DIR_CELL;
 
+typedef struct DIRETORIO
+{
+	int PROFUNDIDADE;
+	DIR_CELL *celulas;
+} DIRETORIO;
+
 /* Usaremos a própria chave como endereço hash
 não há necessidade de transformar as chaves antes de 
 fazer a extração dos bits usados para o endereçamento 
@@ -89,9 +95,11 @@ int op_add(int KEY)
 }
 
 int op_find(int KEY, int FOUND_BUCKET){
-	//int DIR_PROF = 0;
-	//int ADDRESS = make_address(KEY, DIR_PROF);
-	//FOUND_BUCKET = DIRETORIO[ADDRESS].BUCKET_REF
+	int DIR_PROF = 0;
+	int ADDRESS = make_address(KEY, DIR_PROF);
+
+	int FOUND_BUCKET = DIRETORIO[ADDRESS].celulas
+
 	//Ler FOUND_BUCKET para a memória e buscar por KEY
 	//if (chave está em FOUND_BUCKET)
 		//retornar success
